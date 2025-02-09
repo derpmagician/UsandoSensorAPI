@@ -1,16 +1,32 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lectura de Sensores</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="scripts/script.js" defer ></script>
-
+    <script src="scripts/script.js" defer></script>
 </head>
 <body>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch">
+            <input type="checkbox" id="checkbox">
+            <div class="slider round"></div>
+        </label>
+        <em>Modo Oscuro</em>
+    </div>
+
     <h1>Datos del Acelerómetro y Giroscopio</h1>
     <button id="start">Solicitar Permiso</button>
+
+    <div class="compass-container">
+        <div class="compass">
+            <div class="arrow"></div>
+            <div class="compass-center"></div>
+        </div>
+        <div id="compass-degrees">0°</div>
+    </div>
+
     <div class="sensor-data">
         <h3>Acelerómetro</h3>
         <p id="accel">Esperando datos...</p>
@@ -19,6 +35,5 @@
         <h3>Giroscopio</h3>
         <p id="gyro">Esperando datos...</p>
     </div>
-
 </body>
 </html>

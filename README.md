@@ -42,4 +42,7 @@ La aplicación funciona en:
 - Firefox para Android
 - Otros navegadores móviles modernos
 
-## Estructura del Proyecto 
+## Estructura del Proyecto
+
+```
+├── index.html 

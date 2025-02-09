@@ -1,3 +1,6 @@
+let ambientLightSensor = null;
+let proximitySensor = null;
+
 function handleMotion(event) {
     const accel = event.accelerationIncludingGravity;
     document.getElementById('accel').innerText = 
@@ -9,10 +12,8 @@ function handleOrientation(event) {
         document.getElementById('gyro').innerText = 'Giroscopio no disponible';
         return;
     }
-
     document.getElementById('gyro').innerText = 
         `Alpha: ${event.alpha?.toFixed(2)}°\nBeta: ${event.beta?.toFixed(2)}°\nGamma: ${event.gamma?.toFixed(2)}°`;
-
     // Actualizar el compás
     const arrow = document.querySelector('.arrow');
     const degrees = document.getElementById('compass-degrees');
@@ -22,25 +23,17 @@ function handleOrientation(event) {
 }
 
 function handleAmbientLight(event) {
-    const lightLevel = event.target.illuminance;
+    const lightLevel = event ? event.target.illuminance : null;
     const lightElement = document.getElementById('light');
     const lightIndicator = document.querySelector('.light-level');
-    
-    // Actualizar el texto
-    lightElement.innerText = `Nivel de luz: ${lightLevel?.toFixed(1) || 0} lux`;
-    
-    // Actualizar el indicador visual
+
     if (lightLevel !== null) {
-        // Normalizar el valor entre 0 y 100
-        // Los valores típicos van de 0 a varios miles de lux
-        // 0 lux: oscuridad total
-        // 50 lux: sala oscura
-        // 100 lux: muy nublado
-        // 500 lux: oficina
-        // 10000 lux: luz diurna indirecta
-        // 100000 lux: luz solar directa
+        lightElement.innerText = `Nivel de luz: ${lightLevel.toFixed(1)} lux`;
         const normalizedLevel = Math.min(Math.max((lightLevel / 500) * 100, 0), 100);
         lightIndicator.style.width = `${normalizedLevel}%`;
+    } else {
+        lightElement.innerText = 'Sensor de luz no disponible';
+        lightIndicator.style.width = '0%';
     }
 }
 
@@ -48,13 +41,11 @@ function handleProximity(event) {
     const distance = event.value;
     const proximityElement = document.getElementById('proximity');
     const proximityObject = document.querySelector('.proximity-object');
-    
-    // Actualizar el texto
+
     proximityElement.innerText = distance === 0 ? 
         'Objeto cercano detectado' : 
         'No hay objetos cercanos';
-    
-    // Actualizar el indicador visual
+
     proximityObject.style.right = distance === 0 ? '10px' : '160px';
 }
 
@@ -75,23 +66,20 @@ function startSensors() {
 }
 
 function initializeSensors() {
-    // Sensores existentes
+    // Acelerómetro y Giroscopio
     window.addEventListener("devicemotion", handleMotion, true);
     window.addEventListener("deviceorientation", handleOrientation, true);
-    
-    // Sensor de luz
-    if ('AmbientLightSensor' in window) {
+
+    // Sensor de Luz
+    if ("AmbientLightSensor" in window) {
         try {
-            const sensor = new AmbientLightSensor({frequency: 1}); // Actualización cada segundo
-            
-            sensor.addEventListener("reading", handleAmbientLight);
-            
-            sensor.addEventListener("error", (error) => {
-                document.getElementById('light').innerText = 'Error en el sensor de luz';
-                console.error("Error en el sensor de luz:", error.error.message);
+            ambientLightSensor = new AmbientLightSensor();
+            ambientLightSensor.addEventListener("reading", handleAmbientLight);
+            ambientLightSensor.addEventListener("error", (event) => {
+                console.error(event.error.name, event.error.message);
+                document.getElementById('light').innerText = `Error: ${event.error.name}`;
             });
-            
-            sensor.start();
+            ambientLightSensor.start();
         } catch (error) {
             document.getElementById('light').innerText = 'Sensor de luz no disponible';
             console.error('Error al acceder al sensor de luz:', error);
@@ -99,12 +87,16 @@ function initializeSensors() {
     } else {
         document.getElementById('light').innerText = 'Sensor de luz no soportado';
     }
-    
-    // Sensor de proximidad
+
+    // Sensor de Proximidad
     if ('ProximitySensor' in window) {
         try {
-            const proximitySensor = new ProximitySensor();
+            proximitySensor = new ProximitySensor();
             proximitySensor.addEventListener('reading', handleProximity);
+            proximitySensor.addEventListener('error', (event) => {
+                console.error(event.error.name, event.error.message);
+                document.getElementById('proximity').innerText = `Error: ${event.error.name}`;
+            });
             proximitySensor.start();
         } catch (error) {
             document.getElementById('proximity').innerText = 'Sensor de proximidad no disponible';
@@ -121,7 +113,6 @@ function setTheme(theme) {
     localStorage.setItem('theme', theme);
 }
 
-// Esperar a que el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('start');
     startButton.addEventListener('click', startSensors);

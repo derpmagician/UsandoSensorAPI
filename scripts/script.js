@@ -22,7 +22,7 @@ function handleOrientation(event) {
 }
 
 function handleAmbientLight(event) {
-    const lightLevel = event.value;
+    const lightLevel = event.target.illuminance;
     const lightElement = document.getElementById('light');
     const lightIndicator = document.querySelector('.light-level');
     
@@ -32,7 +32,14 @@ function handleAmbientLight(event) {
     // Actualizar el indicador visual
     if (lightLevel !== null) {
         // Normalizar el valor entre 0 y 100
-        const normalizedLevel = Math.min(Math.max((lightLevel / 1000) * 100, 0), 100);
+        // Los valores típicos van de 0 a varios miles de lux
+        // 0 lux: oscuridad total
+        // 50 lux: sala oscura
+        // 100 lux: muy nublado
+        // 500 lux: oficina
+        // 10000 lux: luz diurna indirecta
+        // 100000 lux: luz solar directa
+        const normalizedLevel = Math.min(Math.max((lightLevel / 500) * 100, 0), 100);
         lightIndicator.style.width = `${normalizedLevel}%`;
     }
 }
@@ -75,9 +82,16 @@ function initializeSensors() {
     // Sensor de luz
     if ('AmbientLightSensor' in window) {
         try {
-            const lightSensor = new AmbientLightSensor();
-            lightSensor.addEventListener('reading', handleAmbientLight);
-            lightSensor.start();
+            const sensor = new AmbientLightSensor({frequency: 1}); // Actualización cada segundo
+            
+            sensor.addEventListener("reading", handleAmbientLight);
+            
+            sensor.addEventListener("error", (error) => {
+                document.getElementById('light').innerText = 'Error en el sensor de luz';
+                console.error("Error en el sensor de luz:", error.error.message);
+            });
+            
+            sensor.start();
         } catch (error) {
             document.getElementById('light').innerText = 'Sensor de luz no disponible';
             console.error('Error al acceder al sensor de luz:', error);

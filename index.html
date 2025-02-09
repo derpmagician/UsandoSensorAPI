@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Sensores</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Demo de Sensores</h1>
+        
+        <section id="accelerometer" class="sensor-section">
+            <h2>Acelerómetro</h2>
+            <div class="sensor-data">
+                <p>X: <span id="accel-x">0</span> m/s²</p>
+                <p>Y: <span id="accel-y">0</span> m/s²</p>
+                <p>Z: <span id="accel-z">0</span> m/s²</p>
+            </div>
+        </section>
+
+        <section id="gyroscope" class="sensor-section">
+            <h2>Giroscopio</h2>
+            <div class="sensor-data">
+                <p>X: <span id="gyro-x">0</span> rad/s</p>
+                <p>Y: <span id="gyro-y">0</span> rad/s</p>
+                <p>Z: <span id="gyro-z">0</span> rad/s</p>
+            </div>
+        </section>
+
+        <section id="orientation" class="sensor-section">
+            <h2>Orientación</h2>
+            <div class="sensor-data">
+                <p>Alpha: <span id="alpha">0</span>°</p>
+                <p>Beta: <span id="beta">0</span>°</p>
+                <p>Gamma: <span id="gamma">0</span>°</p>
+            </div>
+        </section>
+
+        <div id="error-message" class="error hidden">
+            Tu dispositivo no soporta los sensores o no has dado permiso para acceder a ellos.
+        </div>
+    </div>
+    <script src="/scripts/script.js"></script>
+</body>
+</html>

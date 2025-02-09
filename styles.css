@@ -80,4 +80,28 @@ h1 {
     background-color: #2196F3;
     border-radius: 50%;
     transition: transform 0.3s;
+}
+
+.permission-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+.permission-button:hover {
+    background-color: #1976D2;
+}
+
+.instructions {
+    background-color: #E3F2FD;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    line-height: 1.5;
 } 

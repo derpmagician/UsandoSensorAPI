@@ -1,74 +1,104 @@
 document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('error-message');
 
-    // Función para actualizar los valores en la UI
-    function updateUI(elementId, value) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            // Actualizar el valor
-            element.textContent = value.toFixed(2);
-            
-            // Añadir efecto visual
-            element.classList.add('updated');
-            setTimeout(() => {
-                element.classList.remove('updated');
-            }, 300);
+    // Función para solicitar permisos
+    async function requestPermission() {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission === 'granted') {
+                    initSensors();
+                } else {
+                    errorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error al solicitar permiso:', error);
+                errorMessage.classList.remove('hidden');
+            }
+        } else {
+            initSensors();
+        }
+    }
 
-            // Actualizar el indicador visual
-            const section = element.closest('.sensor-section');
-            if (section) {
-                const dot = section.querySelector('.indicator-dot');
-                if (dot) {
-                    dot.style.transform = `translate(${value * 2}px, ${value * 2}px)`;
+    // Función principal para inicializar sensores
+    function initSensors() {
+        // Función para actualizar los valores en la UI
+        function updateUI(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                // Actualizar el valor
+                element.textContent = typeof value === 'number' ? value.toFixed(2) : '0';
+                
+                // Añadir efecto visual
+                element.classList.add('updated');
+                setTimeout(() => {
+                    element.classList.remove('updated');
+                }, 300);
+
+                // Actualizar el indicador visual
+                const section = element.closest('.sensor-section');
+                if (section) {
+                    const dot = section.querySelector('.indicator-dot');
+                    if (dot) {
+                        dot.style.transform = `translate(${value * 2}px, ${value * 2}px)`;
+                    }
                 }
             }
         }
-    }
 
-    // Acelerómetro
-    if ('Accelerometer' in window) {
-        try {
-            const accelerometer = new Accelerometer({ frequency: 60 });
-            
-            accelerometer.addEventListener('reading', () => {
-                updateUI('accel-x', accelerometer.x);
-                updateUI('accel-y', accelerometer.y);
-                updateUI('accel-z', accelerometer.z);
+        // Acelerómetro
+        if ('Accelerometer' in window) {
+            try {
+                const accelerometer = new Accelerometer({ frequency: 60 });
+                
+                accelerometer.addEventListener('reading', () => {
+                    updateUI('accel-x', accelerometer.x);
+                    updateUI('accel-y', accelerometer.y);
+                    updateUI('accel-z', accelerometer.z);
+                });
+                
+                accelerometer.start();
+            } catch (error) {
+                console.error('Error al acceder al acelerómetro:', error);
+                errorMessage.classList.remove('hidden');
+            }
+        }
+
+        // Giroscopio
+        if ('Gyroscope' in window) {
+            try {
+                const gyroscope = new Gyroscope({ frequency: 60 });
+                
+                gyroscope.addEventListener('reading', () => {
+                    updateUI('gyro-x', gyroscope.x);
+                    updateUI('gyro-y', gyroscope.y);
+                    updateUI('gyro-z', gyroscope.z);
+                });
+                
+                gyroscope.start();
+            } catch (error) {
+                console.error('Error al acceder al giroscopio:', error);
+                errorMessage.classList.remove('hidden');
+            }
+        }
+
+        // Orientación
+        if ('DeviceOrientationEvent' in window) {
+            window.addEventListener('deviceorientation', (event) => {
+                updateUI('alpha', event.alpha);
+                updateUI('beta', event.beta);
+                updateUI('gamma', event.gamma);
             });
-            
-            accelerometer.start();
-        } catch (error) {
-            console.error('Error al acceder al acelerómetro:', error);
+        } else {
             errorMessage.classList.remove('hidden');
         }
     }
 
-    // Giroscopio
-    if ('Gyroscope' in window) {
-        try {
-            const gyroscope = new Gyroscope({ frequency: 60 });
-            
-            gyroscope.addEventListener('reading', () => {
-                updateUI('gyro-x', gyroscope.x);
-                updateUI('gyro-y', gyroscope.y);
-                updateUI('gyro-z', gyroscope.z);
-            });
-            
-            gyroscope.start();
-        } catch (error) {
-            console.error('Error al acceder al giroscopio:', error);
-            errorMessage.classList.remove('hidden');
-        }
-    }
+    // Agregar botón para solicitar permisos
+    const permissionButton = document.createElement('button');
+    permissionButton.textContent = 'Activar Sensores';
+    permissionButton.className = 'permission-button';
+    document.querySelector('.container').prepend(permissionButton);
 
-    // Orientación
-    if ('DeviceOrientationEvent' in window) {
-        window.addEventListener('deviceorientation', (event) => {
-            updateUI('alpha', event.alpha);
-            updateUI('beta', event.beta);
-            updateUI('gamma', event.gamma);
-        });
-    } else {
-        errorMessage.classList.remove('hidden');
-    }
+    permissionButton.addEventListener('click', requestPermission);
 }); 

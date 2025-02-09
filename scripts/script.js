@@ -5,7 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUI(elementId, value) {
         const element = document.getElementById(elementId);
         if (element) {
+            // Actualizar el valor
             element.textContent = value.toFixed(2);
+            
+            // Añadir efecto visual
+            element.classList.add('updated');
+            setTimeout(() => {
+                element.classList.remove('updated');
+            }, 300);
+
+            // Actualizar el indicador visual
+            const section = element.closest('.sensor-section');
+            if (section) {
+                const dot = section.querySelector('.indicator-dot');
+                if (dot) {
+                    dot.style.transform = `translate(${value * 2}px, ${value * 2}px)`;
+                }
+            }
         }
     }
 

@@ -42,5 +42,12 @@
         </div>
     </div>
     <script src="/scripts/script.js"></script>
+    <script>
+    window.addEventListener('deviceorientation', (event) => {
+        updateUI('alpha', event.alpha);
+        updateUI('beta', event.beta);
+        updateUI('gamma', event.gamma);
+    });
+    </script>
 </body>
 </html>

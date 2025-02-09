@@ -1,6 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('error-message');
 
+    // Función para actualizar los valores en la UI (movida fuera)
+    function updateUI(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            // Actualizar el valor
+            element.textContent = typeof value === 'number' ? value.toFixed(2) : '0';
+            
+            // Añadir efecto visual
+            element.classList.add('updated');
+            setTimeout(() => {
+                element.classList.remove('updated');
+            }, 300);
+
+            // Actualizar el indicador visual
+            const section = element.closest('.sensor-section');
+            if (section) {
+                const dot = section.querySelector('.indicator-dot');
+                if (dot) {
+                    dot.style.transform = `translate(${value * 2}px, ${value * 2}px)`;
+                }
+            }
+        }
+    }
+
     // Función para solicitar permisos
     async function requestPermission() {
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -22,30 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función principal para inicializar sensores
     function initSensors() {
-        // Función para actualizar los valores en la UI
-        function updateUI(elementId, value) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                // Actualizar el valor
-                element.textContent = typeof value === 'number' ? value.toFixed(2) : '0';
-                
-                // Añadir efecto visual
-                element.classList.add('updated');
-                setTimeout(() => {
-                    element.classList.remove('updated');
-                }, 300);
-
-                // Actualizar el indicador visual
-                const section = element.closest('.sensor-section');
-                if (section) {
-                    const dot = section.querySelector('.indicator-dot');
-                    if (dot) {
-                        dot.style.transform = `translate(${value * 2}px, ${value * 2}px)`;
-                    }
-                }
-            }
-        }
-
         // Acelerómetro
         if ('Accelerometer' in window) {
             try {
@@ -99,6 +99,5 @@ document.addEventListener('DOMContentLoaded', () => {
     permissionButton.textContent = 'Activar Sensores';
     permissionButton.className = 'permission-button';
     document.querySelector('.container').prepend(permissionButton);
-
     permissionButton.addEventListener('click', requestPermission);
-}); 
+});

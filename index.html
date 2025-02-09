@@ -4,32 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lectura de Sensores</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            color: #333;
-        }
-        .sensor-data {
-            background: white;
-            padding: 15px;
-            margin: 10px auto;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="scripts/script.js" defer ></script>
+
 </head>
 <body>
     <h1>Datos del Acelerómetro y Giroscopio</h1>
@@ -43,38 +20,5 @@
         <p id="gyro">Esperando datos...</p>
     </div>
 
-    <script>
-        function handleMotion(event) {
-            const accel = event.accelerationIncludingGravity;
-            document.getElementById('accel').innerText = 
-                `X: ${accel.x?.toFixed(2)} m/s²\nY: ${accel.y?.toFixed(2)} m/s²\nZ: ${accel.z?.toFixed(2)} m/s²`;
-        }
-
-        function handleOrientation(event) {
-            document.getElementById('gyro').innerText = 
-                `Alpha: ${event.alpha?.toFixed(2)}°\nBeta: ${event.beta?.toFixed(2)}°\nGamma: ${event.gamma?.toFixed(2)}°`;
-        }
-
-        function startSensors() {
-            if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener("devicemotion", handleMotion, true);
-                            window.addEventListener("deviceorientation", handleOrientation, true);
-                        } else {
-                            alert("Permiso denegado");
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                // Para navegadores que no requieren permisos manuales
-                window.addEventListener("devicemotion", handleMotion, true);
-                window.addEventListener("deviceorientation", handleOrientation, true);
-            }
-        }
-
-        document.getElementById('start').addEventListener('click', startSensors);
-    </script>
 </body>
 </html>

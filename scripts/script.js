@@ -1,21 +1,24 @@
 function handleMotion(event) {
     const accel = event.accelerationIncludingGravity;
     document.getElementById('accel').innerText = 
-        `X: ${accel.x?.toFixed(2)} m/s²\nY: ${accel.y?.toFixed(2)} m/s²\nZ: ${accel.z?.toFixed(2)} m/s²`;
+        `X: ${accel?.x?.toFixed(2) || 0} m/s²\nY: ${accel?.y?.toFixed(2) || 0} m/s²\nZ: ${accel?.z?.toFixed(2) || 0} m/s²`;
 }
 
 function handleOrientation(event) {
+    if (event.alpha === null || event.beta === null || event.gamma === null) {
+        document.getElementById('gyro').innerText = 'Giroscopio no disponible';
+        return;
+    }
+
     document.getElementById('gyro').innerText = 
         `Alpha: ${event.alpha?.toFixed(2)}°\nBeta: ${event.beta?.toFixed(2)}°\nGamma: ${event.gamma?.toFixed(2)}°`;
-    
+
     // Actualizar el compás
-    if (event.alpha !== null) {
-        const arrow = document.querySelector('.arrow');
-        const degrees = document.getElementById('compass-degrees');
-        const rotation = 360 - event.alpha; // Invertimos para que apunte al norte correctamente
-        arrow.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
-        degrees.textContent = `${Math.round(event.alpha)}°`;
-    }
+    const arrow = document.querySelector('.arrow');
+    const degrees = document.getElementById('compass-degrees');
+    const rotation = 360 - event.alpha; // Invertimos para que apunte al norte correctamente
+    arrow.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+    degrees.textContent = `${Math.round(event.alpha)}°`;
 }
 
 function startSensors() {
@@ -51,11 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuración del switch de tema
     const toggleSwitch = document.querySelector('#checkbox');
     const currentTheme = localStorage.getItem('theme') || 'light';
-
     document.documentElement.setAttribute('data-theme', currentTheme);
     toggleSwitch.checked = currentTheme === 'dark';
-
     toggleSwitch.addEventListener('change', function(e) {
         setTheme(e.target.checked ? 'dark' : 'light');
     });
+
+    // Verificar si los sensores están disponibles
+    if (!('DeviceOrientationEvent' in window)) {
+        document.getElementById('gyro').innerText = 'Giroscopio no soportado';
+    }
 });

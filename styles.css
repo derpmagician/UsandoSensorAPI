@@ -29,7 +29,7 @@ h1, h3 {
 .sensor-data {
     background: var(--card-bg);
     padding: 15px;
-    margin: 10px auto;
+    margin: 20px auto;
     width: 90%;
     max-width: 400px;
     box-shadow: 0 0 10px var(--shadow-color);
@@ -155,4 +155,44 @@ input:checked + .slider:before {
     margin-left: 10px;
     font-size: 1rem;
     color: var(--text-color);
+}
+
+/* Estilos para el sensor de luz */
+.light-indicator {
+    width: 100%;
+    height: 20px;
+    background: var(--card-bg);
+    border: 2px solid #2196F3;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.light-level {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, #FFD700, #FFA500);
+    transition: width 0.3s ease;
+}
+
+/* Estilos para el sensor de proximidad */
+.proximity-indicator {
+    width: 200px;
+    height: 60px;
+    margin: 10px auto;
+    position: relative;
+    background: var(--card-bg);
+    border: 2px solid #2196F3;
+    border-radius: 10px;
+}
+
+.proximity-object {
+    width: 20px;
+    height: 40px;
+    background: #2196F3;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: right 0.3s ease;
 }

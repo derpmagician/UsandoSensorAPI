@@ -21,22 +21,83 @@ function handleOrientation(event) {
     degrees.textContent = `${Math.round(event.alpha)}°`;
 }
 
+function handleAmbientLight(event) {
+    const lightLevel = event.value;
+    const lightElement = document.getElementById('light');
+    const lightIndicator = document.querySelector('.light-level');
+    
+    // Actualizar el texto
+    lightElement.innerText = `Nivel de luz: ${lightLevel?.toFixed(1) || 0} lux`;
+    
+    // Actualizar el indicador visual
+    if (lightLevel !== null) {
+        // Normalizar el valor entre 0 y 100
+        const normalizedLevel = Math.min(Math.max((lightLevel / 1000) * 100, 0), 100);
+        lightIndicator.style.width = `${normalizedLevel}%`;
+    }
+}
+
+function handleProximity(event) {
+    const distance = event.value;
+    const proximityElement = document.getElementById('proximity');
+    const proximityObject = document.querySelector('.proximity-object');
+    
+    // Actualizar el texto
+    proximityElement.innerText = distance === 0 ? 
+        'Objeto cercano detectado' : 
+        'No hay objetos cercanos';
+    
+    // Actualizar el indicador visual
+    proximityObject.style.right = distance === 0 ? '10px' : '160px';
+}
+
 function startSensors() {
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
         DeviceMotionEvent.requestPermission()
             .then(permissionState => {
                 if (permissionState === 'granted') {
-                    window.addEventListener("devicemotion", handleMotion, true);
-                    window.addEventListener("deviceorientation", handleOrientation, true);
+                    initializeSensors();
                 } else {
                     alert("Permiso denegado");
                 }
             })
             .catch(console.error);
     } else {
-        // Para navegadores que no requieren permisos manuales
-        window.addEventListener("devicemotion", handleMotion, true);
-        window.addEventListener("deviceorientation", handleOrientation, true);
+        initializeSensors();
+    }
+}
+
+function initializeSensors() {
+    // Sensores existentes
+    window.addEventListener("devicemotion", handleMotion, true);
+    window.addEventListener("deviceorientation", handleOrientation, true);
+    
+    // Sensor de luz
+    if ('AmbientLightSensor' in window) {
+        try {
+            const lightSensor = new AmbientLightSensor();
+            lightSensor.addEventListener('reading', handleAmbientLight);
+            lightSensor.start();
+        } catch (error) {
+            document.getElementById('light').innerText = 'Sensor de luz no disponible';
+            console.error('Error al acceder al sensor de luz:', error);
+        }
+    } else {
+        document.getElementById('light').innerText = 'Sensor de luz no soportado';
+    }
+    
+    // Sensor de proximidad
+    if ('ProximitySensor' in window) {
+        try {
+            const proximitySensor = new ProximitySensor();
+            proximitySensor.addEventListener('reading', handleProximity);
+            proximitySensor.start();
+        } catch (error) {
+            document.getElementById('proximity').innerText = 'Sensor de proximidad no disponible';
+            console.error('Error al acceder al sensor de proximidad:', error);
+        }
+    } else {
+        document.getElementById('proximity').innerText = 'Sensor de proximidad no soportado';
     }
 }
 
@@ -63,5 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verificar si los sensores están disponibles
     if (!('DeviceOrientationEvent' in window)) {
         document.getElementById('gyro').innerText = 'Giroscopio no soportado';
+    }
+    if (!('AmbientLightSensor' in window)) {
+        document.getElementById('light').innerText = 'Sensor de luz no soportado';
+    }
+    if (!('ProximitySensor' in window)) {
+        document.getElementById('proximity').innerText = 'Sensor de proximidad no soportado';
     }
 });

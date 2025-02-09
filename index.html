@@ -3,38 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensores Galaxy A04</title>
+    <title>Lectura de Sensores</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
-        .sensor-section {
-            margin-bottom: 20px;
+        h1 {
+            color: #333;
         }
-        .updated {
-            color: green;
-            transition: color 0.3s ease;
+        .sensor-data {
+            background: white;
+            padding: 15px;
+            margin: 10px auto;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Valores del Acelerómetro y Giroscopio</h1>
-
-    <div id="accelerometer" class="sensor-section">
-        <h2>Acelerómetro</h2>
-        <p>X: <span id="accel-x">0</span> m/s²</p>
-        <p>Y: <span id="accel-y">0</span> m/s²</p>
-        <p>Z: <span id="accel-z">0</span> m/s²</p>
+    <h1>Datos del Acelerómetro y Giroscopio</h1>
+    <button id="start">Solicitar Permiso</button>
+    <div class="sensor-data">
+        <h3>Acelerómetro</h3>
+        <p id="accel">Esperando datos...</p>
+    </div>
+    <div class="sensor-data">
+        <h3>Giroscopio</h3>
+        <p id="gyro">Esperando datos...</p>
     </div>
 
-    <div id="gyroscope" class="sensor-section">
-        <h2>Giroscopio</h2>
-        <p>X: <span id="gyro-x">0</span> rad/s</p>
-        <p>Y: <span id="gyro-y">0</span> rad/s</p>
-        <p>Z: <span id="gyro-z">0</span> rad/s</p>
-    </div>
+    <script>
+        function handleMotion(event) {
+            const accel = event.accelerationIncludingGravity;
+            document.getElementById('accel').innerText = 
+                `X: ${accel.x?.toFixed(2)} m/s²\nY: ${accel.y?.toFixed(2)} m/s²\nZ: ${accel.z?.toFixed(2)} m/s²`;
+        }
 
-    <script src="/scripts/script.js"></script>
+        function handleOrientation(event) {
+            document.getElementById('gyro').innerText = 
+                `Alpha: ${event.alpha?.toFixed(2)}°\nBeta: ${event.beta?.toFixed(2)}°\nGamma: ${event.gamma?.toFixed(2)}°`;
+        }
+
+        function startSensors() {
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener("devicemotion", handleMotion, true);
+                            window.addEventListener("deviceorientation", handleOrientation, true);
+                        } else {
+                            alert("Permiso denegado");
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Para navegadores que no requieren permisos manuales
+                window.addEventListener("devicemotion", handleMotion, true);
+                window.addEventListener("deviceorientation", handleOrientation, true);
+            }
+        }
+
+        document.getElementById('start').addEventListener('click', startSensors);
+    </script>
 </body>
 </html>
